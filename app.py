@@ -1,12 +1,16 @@
-
 from flask import Flask, request
 import requests
 from datetime import datetime
 
 app = Flask(__name__)
 
+# Токен основного бота
 TELEGRAM_BOT_TOKEN = "8360366118:AAF96StnUXzgyHYB-W0K_SBO7pK2DnUF2mo"
+
+# Telegram ID администратора
 ADMIN_CHAT_ID = 6685441594
+
+# ID Telegram-группы (бот должен быть в ней и иметь права)
 GROUP_CHAT_ID = -1002610049448
 
 def get_timestamp():
@@ -18,7 +22,9 @@ def send_message(text):
         "text": text,
         "parse_mode": "Markdown"
     }
+    # Отправка админу
     requests.post(url, data={**payload, "chat_id": ADMIN_CHAT_ID})
+    # Отправка в группу
     requests.post(url, data={**payload, "chat_id": GROUP_CHAT_ID})
 
 @app.route("/payment/result", methods=["GET", "POST"])
@@ -102,6 +108,8 @@ def payment_chargeback():
         return "<h3>🚨 Этот маршрут обрабатывает только POST-запросы от платёжной системы.</h3>"
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=5000)
+
+    @app.route("/")
+    def home():
+        return "<h2>🚀 Сервис работает! Используйте POST-запросы на /payment/*</h2>"
